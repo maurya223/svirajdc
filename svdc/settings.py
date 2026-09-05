@@ -25,7 +25,13 @@ SECRET_KEY = "django-insecure-ic#$*ea@c2)p)+vb7##s+4c2^z#lt!5k5b!3aw$-5u4u8)d$zd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    
+    "shreevirajdentalclinic.onrender.com",
+    "localhost",
+    "127.0.0.1",
+
+]
 
 
 # Application definition
