@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}services{% endblock title%}
+
+{% block body %}
+
+<style>
+  .service-card {
+    flex: 1 1 calc(33% - 30px);
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+  }
+  .service-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: block;
+  }
+  .service-card h4 {
+    color: #0d6efd;
+    margin-bottom: 5px;
+  }
+  .service-card p {
+    color: #6c757d;
+    font-size: 15px;
+    line-height: 1.6;
+    flex-grow: 1;
+  }
+  .service-card strong {
+    color: #198754;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .service-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(90deg, #2563eb, #1e40af);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    width: auto;
+    cursor: pointer;
+  }
+  .service-btn:hover {
+    background: linear-gradient(90deg, #1e3a8a, #eff0f3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    color: #1e3a8a;
+  }
+
+  .services-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3d3e3eff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.5px;
+  }
+  .services-intro {
+    max-width: 800px;
+    margin: 0 auto 40px;
+    text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+    font-family: 'Poppins', sans-serif;
+    padding: 0 20px;
+  }
+  .services-section {
+    padding: 60px 0;
+    background-color: #f8f9fa;
+  }
+  .services-wrap {
+    max-width: 1140px;
+    margin: auto;
+    text-align: center;
+    padding: 0 20px;
+  }
+  .services-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+  }
+
+  /* Tablet: 2 cards per row */
+  @media (max-width: 900px) {
+    .service-card {
+      flex: 1 1 calc(50% - 30px);
+    }
+    .services-heading {
+      font-size: 1.7rem;
+    }
+  }
+
+  /* Mobile: 1 card per row, tighter spacing */
+  @media (max-width: 600px) {
+    .services-section {
+      padding: 40px 0;
+    }
+    .services-grid {
+      gap: 20px;
+    }
+    .service-card {
+      flex: 1 1 100%;
+      min-width: 0;
+      width: 100%;
+      padding: 16px;
+    }
+    .service-card img {
+      height: 180px;
+    }
+    .services-heading {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+    .services-intro {
+      font-size: 1rem;
+      margin-bottom: 28px;
+    }
+    .service-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 0;
+    }
+  }
+</style>
+
+<h2 class="services-heading">
+  Precision Dentistry for Every Generation
+</h2>
+<p class="services-intro">
+  At <strong style="color:#0066cc;">Shree Viraj Dental Clinic</strong>, we offer a complete range of dental services designed to keep your smile healthy, bright, and confident. From routine checkups to advanced treatments, our team is committed to gentle care in a comfortable environment.
+</p>
+
+<section class="services-section">
+  <div class="services-wrap">
+
+    <div class="services-grid">
+
+      <div class="service-card">
+        <img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?q=80&amp;w=774&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0" alt="Teeth cleaning procedure">
+        <h4>Teeth Cleaning</h4>
+        <p>Removes plaque &amp; tartar for a healthier smile.</p>
+        <strong>₹800 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="{% static 'img/teeth_whitening.jpg' %}" alt="Teeth whitening procedure">
+        <h4>Teeth Whitening</h4>
+        <p>Brightens teeth by several shades safely.</p>
+        <strong>₹4,000 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="https://images.unsplash.com/photo-1655807946138-811bb2340d34?q=80&amp;w=971&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0" alt="Teeth polishing procedure">
+        <h4>Teeth Polishing</h4>
+        <p>Smoothens teeth surface for extra shine.</p>
+        <strong>₹500 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="https://www.yourdentistryguide.com/wp-content/uploads/2017/11/dental-filling-min.jpg" alt="Dental filling / restoration">
+        <h4>Teeth Filling (Restoration)</h4>
+        <p>Repairs cavities with strong, tooth-colored materials.</p>
+        <strong>₹1,000 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="https://smilecareindia.com/wp-content/uploads/2022/09/image33-2-1024x680.jpg" alt="Teeth extraction procedure">
+        <h4>Teeth Extraction</h4>
+        <p>Safe and painless removal of problematic teeth.</p>
+        <strong>₹1,200 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="https://www.thantakit.com/wp-content/uploads/2017/03/admin-ajax-37.jpeg" alt="Dental implant">
+        <h4>Dental Implants</h4>
+        <p>Permanent replacement for missing teeth.</p>
+        <strong>₹25,000 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="{% static 'img/crown&bridge.jpg' %}" alt="Crown and bridge">
+        <h4>Crown &amp; Bridge (Caps)</h4>
+        <p>Restores damaged or missing teeth with strong caps.</p>
+        <strong>₹4,000 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="https://www.atlasdentalcentre.ca/wp-content/uploads/2024/04/is-there-a-difference-between-partial-dentures-and-complete-dentures.jpg" alt="Complete dentures">
+        <h4>Complete Dentures</h4>
+        <p>Full set of artificial teeth for total replacement.</p>
+        <strong>₹15,000 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="https://hdorthodontics.com/wp-content/uploads/2019/07/Board-Certified-Orthodontist.gif" alt="Orthodontics braces and aligners">
+        <h4>Orthodontics (Braces &amp; Aligners)</h4>
+        <p>Corrects teeth alignment &amp; improves bite.</p>
+        <strong>₹30,000 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+      <div class="service-card">
+        <img src="https://domf5oio6qrcr.cloudfront.net/medialibrary/16407/gettyimages-1543511026.jpg" alt="Root canal treatment">
+        <h4>Root Canal Treatment (RCT)</h4>
+        <p>Saves infected teeth by cleaning and sealing canals.</p>
+        <strong>₹4,500 onwards</strong>
+        <a href="{% url 'appointment' %}" class="service-btn">Book Appointment</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock body%}
+{% include "footer.html" %}
