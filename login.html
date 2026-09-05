@@ -1,0 +1,235 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login - Shree Viraj Dental Clinic{% endblock title %}
+
+{% block body %}
+
+<style>
+    .login-page {
+        min-height: 75vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, #f4f9ff, #eefaf5);
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 430px;
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.10);
+    }
+
+    .login-logo {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto 20px;
+    }
+
+    .login-title {
+        text-align: center;
+        color: #0d6efd;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+        text-align: center;
+        color: #6c757d;
+        margin-bottom: 30px;
+    }
+
+    .login-field {
+        margin-bottom: 20px;
+    }
+
+    .login-field label {
+        display: block;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 8px;
+    }
+
+    .login-field input {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+    .login-field input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.10);
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #0d6efd, #198754);
+        color: white;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(13, 110, 253, 0.25);
+    }
+
+    .login-error {
+        background: #f8d7da;
+        color: #842029;
+        border: 1px solid #f5c2c7;
+        padding: 12px 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .doctor-register {
+        text-align: center;
+        margin-top: 25px;
+        color: #6c757d;
+    }
+
+    .doctor-register a {
+        color: #0d6efd;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .doctor-register a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+
+        .login-page {
+            padding: 40px 15px;
+        }
+
+        .login-card {
+            padding: 30px 22px;
+        }
+
+        .login-title {
+            font-size: 1.7rem;
+        }
+    }
+</style>
+
+
+<section class="login-page">
+
+    <div class="login-card">
+
+        <!-- Clinic Logo -->
+        <img
+            src="{% static 'img/logo.png' %}"
+            alt="Shree Viraj Dental Clinic"
+            class="login-logo"
+        >
+
+        <h1 class="login-title">
+            Welcome Back
+        </h1>
+
+        <p class="login-subtitle">
+            Login to Shree Viraj Dental Clinic
+        </p>
+
+
+        <!-- Login Error -->
+        {% if error %}
+            <div class="login-error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+
+        <!-- Login Form -->
+        <form method="POST" action="{% url 'login' %}">
+
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="login-field">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your username"
+                    required
+                    autocomplete="username"
+                >
+
+            </div>
+
+
+            <!-- Password -->
+            <div class="login-field">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                >
+
+            </div>
+
+
+            <!-- Login Button -->
+            <button
+                type="submit"
+                class="login-btn"
+            >
+                Login
+            </button>
+
+        </form>
+
+
+        <!-- Doctor Registration -->
+        <div class="doctor-register">
+
+            Are you a doctor?
+
+            <a href="{% url 'doctor_register' %}">
+                Register here
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock body %}
