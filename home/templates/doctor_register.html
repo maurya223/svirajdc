@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Doctor Dashboard - Shree Viraj Dental Clinic
+{% endblock title %}
+
+{% block body %}
+
+<style>
+    .doctor-dashboard {
+        min-height: 100vh;
+        padding: 60px 20px;
+        background: #f5f7fa;
+    }
+
+    .dashboard-container {
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(90deg, #0d6efd, #198754);
+        color: white;
+        padding: 30px;
+        border-radius: 18px;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-header h1 {
+        margin: 0 0 8px;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .dashboard-header p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: 18px;
+        padding: 35px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .profile-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .doctor-image-section {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .doctor-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #e9ecef;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 13px 15px;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        outline: none;
+        transition: 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+    }
+
+    .form-group textarea {
+        min-height: 140px;
+        resize: vertical;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .status-box {
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+
+    .approved {
+        background: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+    }
+
+    .pending {
+        background: #fff3cd;
+        color: #664d03;
+        border: 1px solid #ffecb5;
+    }
+
+    .btn-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    .save-btn {
+        flex: 1;
+        padding: 14px 20px;
+        background: linear-gradient(90deg, #0d6efd, #198754);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .save-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .logout-btn {
+        padding: 14px 25px;
+        background: #dc3545;
+        color: white;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logout-btn:hover {
+        background: #bb2d3b;
+        color: white;
+    }
+
+    .help-text {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-top: 6px;
+    }
+
+    @media (max-width: 600px) {
+        .doctor-dashboard {
+            padding: 35px 15px;
+        }
+
+        .profile-card {
+            padding: 22px;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .btn-row {
+            flex-direction: column;
+        }
+
+        .logout-btn {
+            text-align: center;
+        }
+    }
+</style>
+
+<section class="doctor-dashboard">
+    <div class="dashboard-container">
+
+        <!-- DASHBOARD HEADER -->
+        <p>
+    {% if profile.name %}
+        Welcome, Dr. {{ profile.name }}
+    {% elif request.user.is_authenticated %}
+        Welcome, Dr. {{ request.user.first_name|default:request.user.username }}
+    {% else %}
+        Welcome, Doctor
+    {% endif %}
+</p>
+
+        <!-- APPROVAL STATUS -->
+        {% if profile.is_approved %}
+            <div class="status-box approved">
+                ✓ Your profile has been approved by the administrator.<br>
+                Your profile is now visible on the website.
+            </div>
+        {% else %}
+            <div class="status-box pending">
+                ⏳ Your profile is waiting for administrator approval.<br>
+                Once the administrator approves your profile, it will appear on the website.
+            </div>
+        {% endif %}
+
+        <!-- MESSAGES -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="status-box approved">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- PROFILE CARD -->
+        <div class="profile-card">
+            <div class="profile-title">Update Your Doctor Profile</div>
+
+            <form method="POST" action="{% url 'doctor_dashboard' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Doctor Image Section -->
+                <div class="doctor-image-section">
+                    {% if profile.image %}
+                        <img src="{{ profile.image.url }}" alt="{{ profile.name }}" class="doctor-preview">
+                    {% else %}
+                        <img src="{% static 'img/doctor-default.png' %}" alt="Doctor" class="doctor-preview">
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="image">Doctor Photo</label>
+                        <input type="file" id="image" name="image" accept="image/*">
+                        <div class="help-text">Upload a professional doctor photo.</div>
+                    </div>
+                </div>
+
+                <!-- Doctor Name -->
+                <div class="form-group">
+                    <label for="name">Doctor Name</label>
+                    <input type="text" id="name" name="name" value="{{ profile.name|default:'' }}" placeholder="Enter doctor name" required>
+                </div>
+
+                <!-- Qualification & Experience -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="qualification">Qualification</label>
+                        <input type="text" id="qualification" name="qualification" value="{{ profile.qualification|default:'' }}" placeholder="Example: BDS, MDS">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience">Experience (Years)</label>
+                        <input type="number" id="experience" name="experience" value="{{ profile.experience|default:'' }}" min="0" placeholder="Example: 10">
+                    </div>
+                </div>
+
+                <!-- Specialization -->
+                <div class="form-group">
+                    <label for="specialization">Specialization</label>
+                    <input type="text" id="specialization" name="specialization" value="{{ profile.specialization|default:'' }}" placeholder="Example: Cosmetic Dentistry">
+                </div>
+
+                <!-- Bio -->
+                <div class="form-group">
+                    <label for="bio">Doctor Bio</label>
+                    <textarea id="bio" name="bio" placeholder="Write something about the doctor...">{{ profile.bio|default:'' }}</textarea>
+                </div>
+
+                <!-- Submit / Logout Buttons -->
+                <div class="btn-row">
+                    <button type="submit" class="save-btn">Save / Update Profile</button>
+                    <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+{% endblock body %}
