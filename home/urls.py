@@ -52,7 +52,6 @@ urlpatterns = [
         views.contact_success,
         name="contact_success"
     ),
-
     # LOGIN
     path(
         "login/",

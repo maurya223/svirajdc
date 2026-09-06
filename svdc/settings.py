@@ -138,3 +138,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+# Auth Redirect Setting (MOST IMPORTANT)
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'doctor_dashboard'
+LOGOUT_REDIRECT_URL = 'home'

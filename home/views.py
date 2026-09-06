@@ -60,15 +60,18 @@ def login_view(request):
 # DOCTOR REGISTER
 # =========================================================
 
-@login_required
+
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from .models import DoctorProfile
+
 def doctor_register(request):
-
-    profile, created = DoctorProfile.objects.get_or_create(
-        user=request.user
-    )
-
     if request.method == "POST":
-
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password", "")
+        
         name = request.POST.get("name", "").strip()
         qualification = request.POST.get("qualification", "").strip()
         experience = request.POST.get("experience", "").strip()
@@ -76,32 +79,28 @@ def doctor_register(request):
         bio = request.POST.get("bio", "").strip()
         image = request.FILES.get("image")
 
-        profile.name = name
-        profile.qualification = qualification
-        profile.experience = int(experience) if experience.isdigit() else 0
-        profile.specialization = specialization
-        profile.bio = bio
+        # 1. User account create karein
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists!")
+            return redirect("doctor_register")
 
-        if image:
-            profile.image = image
+        user = User.objects.create_user(username=username, email=email, password=password)
 
-        profile.save()
-
-        messages.success(
-            request,
-            "Profile updated successfully!"
+        # 2. DoctorProfile create karein
+        profile = DoctorProfile.objects.create(
+            user=user,
+            name=name,
+            qualification=qualification,
+            experience=int(experience) if experience.isdigit() else 0,
+            specialization=specialization,
+            bio=bio,
+            image=image if image else None
         )
 
-        return redirect("doctor_register")
+        messages.success(request, "Registration successful! Please login.")
+        return redirect("login")
 
-    return render(
-        request,
-        "doctor_register.html",
-        {
-            "profile": profile
-        }
-    )
-
+    return render(request, "doctor_register.html")
 
 # =========================================================
 # DOCTOR DASHBOARD
@@ -224,7 +223,7 @@ def doctor_dashboard(request):
 
     return render(
         request,
-        "doctor_register.html",
+        "doctor_register",
         context
     )
 
