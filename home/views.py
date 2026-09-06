@@ -237,6 +237,50 @@ def logout_view(request):
 
     return redirect("login")
 
+"""
+def index(request):
+
+    if request.method == "POST" and request.POST.get("form_type") == "feedback":
+
+        form = FeedbackForm(request.POST)
+
+        if form.is_valid():
+
+            feedback = form.save()
+
+            # New feedback remains pending
+            feedback.is_approved = False
+            feedback.save()
+
+            messages.success(
+                request,
+                "Thank you for your feedback! It will be visible after admin approval."
+            )
+
+            return redirect("home")
+
+        else:
+            messages.error(
+                request,
+                "Please correct the errors below."
+            )
+
+    else:
+        form = FeedbackForm()
+
+    # Only admin-approved feedback
+    approved_feedbacks = Feedback.objects.filter(
+        is_approved=True
+    ).order_by("-date_created")
+
+    return render(
+        request,
+        "index.html",
+        {
+            "feedback_form": form,
+            "feedbacks": approved_feedbacks,
+        }
+    )"""
 
 # =========================================================
 # HOME / FEEDBACK
@@ -250,32 +294,44 @@ def index(request):
 
         if form.is_valid():
 
-            form.save()
+            feedback = form.save()
+
+            # Keep feedback hidden until admin approves it
+            feedback.is_approved = False
+            feedback.save()
+
             messages.success(
                 request,
-                "Thank you for your feedback!"
+                "Thank you for your feedback! "
+                "It will be visible after admin approval."
             )
 
             return redirect("home")
 
         else:
-
             messages.error(
                 request,
                 "Please correct the errors below."
             )
 
     else:
-
         form = FeedbackForm()
+
+    # Only show feedback approved by admin
+    approved_feedbacks = Feedback.objects.filter(
+        is_approved=True
+    ).order_by("-date_created")
 
     return render(
         request,
         "index.html",
         {
-            "feedback_form": form
+            "feedback_form": form,
+            "feedbacks": approved_feedbacks,
         }
     )
+
+
 
 
 # =========================================================
@@ -455,3 +511,70 @@ def feedback_success(request):
         request,
         "feedback_success.html"
     )
+
+from django.shortcuts import get_object_or_404
+
+
+def feedback_update(request, pk):
+
+    feedback = get_object_or_404(
+        Feedback,
+        pk=pk
+    )
+
+    if request.method == "POST":
+
+        form = FeedbackForm(
+            request.POST,
+            instance=feedback
+        )
+
+        if form.is_valid():
+
+            feedback = form.save()
+
+            # Edited feedback must be approved again
+            feedback.is_approved = False
+            feedback.save()
+
+            messages.success(
+                request,
+                "Feedback updated successfully. "
+                "It will be visible after admin approval."
+            )
+
+            return redirect("home")
+
+    else:
+
+        form = FeedbackForm(
+            instance=feedback
+        )
+
+    return render(
+        request,
+        "feedback_update.html",
+        {
+            "form": form,
+            "feedback": feedback,
+        }
+    )
+
+
+def feedback_delete(request, pk):
+
+    feedback = get_object_or_404(
+        Feedback,
+        pk=pk
+    )
+
+    if request.method == "POST":
+
+        feedback.delete()
+
+        messages.success(
+            request,
+            "Feedback deleted successfully."
+        )
+
+    return redirect("home")

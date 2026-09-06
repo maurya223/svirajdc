@@ -79,4 +79,19 @@ urlpatterns = [
         views.logout_view,
         name="logout"
     ),
+    
+    # FEEDBACK
+    path(
+        "feedback/<int:pk>/edit/",
+        views.feedback_update,
+        name="feedback_update"
+    ),
+
+    path(
+        "feedback/<int:pk>/delete/",
+        views.feedback_delete,
+        name="feedback_delete"
+    ),
+
+
 ]

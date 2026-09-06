@@ -615,6 +615,7 @@
     </div>
   </div>
 </section>
+
 <!-- Feedback Section -->
 <section class="feedback-section">
   <div class="feedback-container">
@@ -630,6 +631,7 @@
 
     <!-- Approved Testimonials -->
     {% if feedbacks %}
+
       <div class="testimonial-grid">
 
         {% for fb in feedbacks %}
@@ -654,18 +656,24 @@
               {{ fb.message }}
             </div>
 
+
             <!-- Rating -->
             {% if fb.rating %}
               <div class="testimonial-rating">
+
                 {% for i in "12345" %}
+
                   {% if forloop.counter <= fb.rating %}
                     ★
                   {% else %}
                     ☆
                   {% endif %}
+
                 {% endfor %}
+
               </div>
             {% endif %}
+
 
             <!-- Date -->
             <div class="testimonial-date">
@@ -673,8 +681,9 @@
             </div>
 
 
-            <!-- Admin/User actions -->
+            <!-- Admin Actions -->
             {% if user.is_superuser %}
+
               <div class="testimonial-actions">
 
                 <a
@@ -684,12 +693,14 @@
                   Edit
                 </a>
 
+
                 <form
                   method="post"
                   action="{% url 'feedback_delete' fb.pk %}"
                   onsubmit="return confirm('Delete this feedback?');"
                   style="flex:1 1 auto; margin:0;"
                 >
+
                   {% csrf_token %}
 
                   <button
@@ -703,6 +714,7 @@
                 </form>
 
               </div>
+
             {% endif %}
 
           </div>
@@ -711,10 +723,12 @@
 
       </div>
 
+
     {% else %}
 
+      <!-- No Approved Feedback -->
       <p class="testimonial-empty">
-        No feedback yet — be the first to share yours!
+        No approved feedback available yet.
       </p>
 
     {% endif %}
@@ -775,7 +789,6 @@
 
             {{ field }}
 
-
             {% if field.errors %}
 
               <ul class="errorlist">
@@ -810,6 +823,7 @@
 
   </div>
 </section>
+
 
 
 <!-- Floating WhatsApp Button -->
