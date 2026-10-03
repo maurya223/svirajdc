@@ -1,43 +1,51 @@
-
 from django.contrib import admin
 from .models import Contact, Appointment, Feedback, DoctorProfile
 
 
-admin.site.register(Contact)
-admin.site.register(Appointment)
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "email", "phone", "subject", "date")
+    search_fields = ("name", "email", "phone", "subject", "message")
+    list_filter = ("date",)
+
+
+@admin.register(Appointment)
+class AppointmentAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "name",
+        "email",
+        "phone",
+        "date",
+        "time",
+        "service",
+        "amount",
+        "status",
+        "paid",
+        "date_created",
+    )
+    search_fields = ("name", "email", "phone", "message")
+    list_filter = ("status", "paid", "service", "date")
 
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "name",
         "email",
-        "message",
         "rating",
         "is_approved",
         "date_created",
     )
+    search_fields = ("name", "email", "message")
+    list_filter = ("rating", "is_approved")
 
-    search_fields = (
-        "name",
-        "email",
-        "message",
-    )
-
-    list_filter = (
-        "rating",
-        "is_approved",
-        "date_created",
-    )
-
-# =========================
-# DOCTOR PROFILE
-# =========================
 
 @admin.register(DoctorProfile)
 class DoctorProfileAdmin(admin.ModelAdmin):
-
     list_display = (
+        "id",
         "name",
         "qualification",
         "specialization",
@@ -45,19 +53,5 @@ class DoctorProfileAdmin(admin.ModelAdmin):
         "is_approved",
         "updated_at",
     )
-
-    search_fields = (
-        "name",
-        "qualification",
-        "specialization",
-    )
-
-    list_filter = (
-        "is_approved",
-        "specialization",
-    )
-
-    # Admin list page par directly approval kar sakte ho
-    list_editable = (
-        "is_approved",
-    )
+    search_fields = ("name", "qualification", "specialization")
+    list_filter = ("is_approved",)

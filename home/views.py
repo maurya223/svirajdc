@@ -7,8 +7,18 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from .models import Appointment, Contact, Feedback, DoctorProfile
-from .forms import AppointmentForm, ContactForm, FeedbackForm
+from .models import (
+    Appointment,
+    Contact,
+    Feedback,
+    DoctorProfile,
+)
+
+from .forms import (
+    AppointmentForm,
+    ContactForm,
+    FeedbackForm,
+)
 
 
 # =========================================================
@@ -19,8 +29,15 @@ def login_view(request):
 
     if request.method == "POST":
 
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        username = request.POST.get(
+            "username",
+            ""
+        ).strip()
+
+        password = request.POST.get(
+            "password",
+            ""
+        )
 
         user = authenticate(
             request,
@@ -32,75 +49,192 @@ def login_view(request):
 
             login(request, user)
 
-            # Admin / Boss
+            # Admin / Superuser
             if user.is_superuser:
                 return redirect("/admin/")
 
-            # Doctor
+            # Normal Doctor
             return redirect("doctor_dashboard")
 
-        else:
+        messages.error(
+            request,
+            "Invalid username or password."
+        )
 
-            return render(
-                request,
-                "login.html",
-                {
-                    "error": "Invalid username or password."
-                }
-            )
-
-    return render(request, "login.html")
+    return render(
+        request,
+        "login.html"
+    )
 
 
 # =========================================================
 # DOCTOR REGISTER
 # =========================================================
-
-# =========================================================
-# DOCTOR REGISTER
-# =========================================================
-
-
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from .models import DoctorProfile
 
 def doctor_register(request):
+
     if request.method == "POST":
-        username = request.POST.get("username", "").strip()
-        email = request.POST.get("email", "").strip()
-        password = request.POST.get("password", "")
-        
-        name = request.POST.get("name", "").strip()
-        qualification = request.POST.get("qualification", "").strip()
-        experience = request.POST.get("experience", "").strip()
-        specialization = request.POST.get("specialization", "").strip()
-        bio = request.POST.get("bio", "").strip()
-        image = request.FILES.get("image")
 
-        # 1. User account create karein
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists!")
-            return redirect("doctor_register")
+        # -------------------------------------------------
+        # Account Information
+        # -------------------------------------------------
 
-        user = User.objects.create_user(username=username, email=email, password=password)
+        username = request.POST.get(
+            "username",
+            ""
+        ).strip()
 
-        # 2. DoctorProfile create karein
-        profile = DoctorProfile.objects.create(
+        email = request.POST.get(
+            "email",
+            ""
+        ).strip()
+
+        password = request.POST.get(
+            "password",
+            ""
+        )
+
+        # -------------------------------------------------
+        # Doctor Information
+        # -------------------------------------------------
+
+        name = request.POST.get(
+            "name",
+            ""
+        ).strip()
+
+        qualification = request.POST.get(
+            "qualification",
+            ""
+        ).strip()
+
+        experience = request.POST.get(
+            "experience",
+            ""
+        ).strip()
+
+        specialization = request.POST.get(
+            "specialization",
+            ""
+        ).strip()
+
+        bio = request.POST.get(
+            "bio",
+            ""
+        ).strip()
+
+        image = request.FILES.get(
+            "image"
+        )
+
+        # -------------------------------------------------
+        # Basic Validation
+        # -------------------------------------------------
+
+        if not username:
+
+            messages.error(
+                request,
+                "Username is required."
+            )
+
+            return redirect(
+                "doctor_register"
+            )
+
+        if not email:
+
+            messages.error(
+                request,
+                "Email is required."
+            )
+
+            return redirect(
+                "doctor_register"
+            )
+
+        if not password:
+
+            messages.error(
+                request,
+                "Password is required."
+            )
+
+            return redirect(
+                "doctor_register"
+            )
+
+        if not name:
+
+            messages.error(
+                request,
+                "Doctor name is required."
+            )
+
+            return redirect(
+                "doctor_register"
+            )
+
+        # -------------------------------------------------
+        # Username Check
+        # -------------------------------------------------
+
+        if User.objects.filter(
+            username=username
+        ).exists():
+
+            messages.error(
+                request,
+                "Username already exists!"
+            )
+
+            return redirect(
+                "doctor_register"
+            )
+
+        # -------------------------------------------------
+        # Create User Account
+        # -------------------------------------------------
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        # -------------------------------------------------
+        # Create Doctor Profile
+        # -------------------------------------------------
+
+        DoctorProfile.objects.create(
             user=user,
             name=name,
             qualification=qualification,
-            experience=int(experience) if experience.isdigit() else 0,
+            experience=(
+                int(experience)
+                if experience.isdigit()
+                else 0
+            ),
             specialization=specialization,
             bio=bio,
             image=image if image else None
         )
 
-        messages.success(request, "Registration successful! Please login.")
-        return redirect("login")
+        messages.success(
+            request,
+            "Doctor registration successful! "
+            "Please login."
+        )
 
-    return render(request, "doctor_register.html")
+        return redirect(
+            "login"
+        )
+
+    return render(
+        request,
+        "doctor_register.html"
+    )
+
 
 # =========================================================
 # DOCTOR DASHBOARD
@@ -109,7 +243,9 @@ def doctor_register(request):
 @login_required
 def doctor_dashboard(request):
 
-    selected_doctor_id = request.GET.get("doctor_id")
+    selected_doctor_id = request.GET.get(
+        "doctor_id"
+    )
 
     # =====================================================
     # ADMIN / SUPERUSER
@@ -119,12 +255,17 @@ def doctor_dashboard(request):
 
         all_doctors = DoctorProfile.objects.all()
 
+        # Admin selected a specific doctor
         if selected_doctor_id:
+
             profile = get_object_or_404(
                 DoctorProfile,
                 id=selected_doctor_id
             )
+
+        # No doctor selected
         else:
+
             profile = all_doctors.first()
 
     # =====================================================
@@ -135,12 +276,16 @@ def doctor_dashboard(request):
 
         all_doctors = None
 
-        profile, created = DoctorProfile.objects.get_or_create(
-            user=request.user,
-            defaults={
-                "name": request.user.get_full_name()
-                or request.user.username
-            }
+        profile, created = (
+            DoctorProfile.objects.get_or_create(
+                user=request.user,
+                defaults={
+                    "name": (
+                        request.user.get_full_name()
+                        or request.user.username
+                    )
+                }
+            )
         )
 
     # =====================================================
@@ -149,50 +294,87 @@ def doctor_dashboard(request):
 
     if request.method == "POST":
 
-        if not profile:
+        if profile is None:
 
             messages.error(
                 request,
                 "No doctor profile found to update."
             )
 
-            return redirect("doctor_dashboard")
+            return redirect(
+                "doctor_dashboard"
+            )
+
+        # -------------------------------------------------
+        # Doctor Name
+        # -------------------------------------------------
 
         profile.name = request.POST.get(
             "name",
             ""
         ).strip()
 
+        # -------------------------------------------------
+        # Qualification
+        # -------------------------------------------------
+
         profile.qualification = request.POST.get(
             "qualification",
             ""
         ).strip()
+
+        # -------------------------------------------------
+        # Specialization
+        # -------------------------------------------------
 
         profile.specialization = request.POST.get(
             "specialization",
             ""
         ).strip()
 
+        # -------------------------------------------------
+        # Bio
+        # -------------------------------------------------
+
         profile.bio = request.POST.get(
             "bio",
             ""
         ).strip()
+
+        # -------------------------------------------------
+        # Experience
+        # -------------------------------------------------
 
         experience = request.POST.get(
             "experience",
             ""
         ).strip()
 
-        profile.experience = (
-            int(experience)
-            if experience.isdigit()
-            else 0
+        if experience.isdigit():
+
+            profile.experience = int(
+                experience
+            )
+
+        else:
+
+            profile.experience = 0
+
+        # -------------------------------------------------
+        # Doctor Image
+        # -------------------------------------------------
+
+        image = request.FILES.get(
+            "image"
         )
 
-        image = request.FILES.get("image")
-
         if image:
+
             profile.image = image
+
+        # -------------------------------------------------
+        # Save Profile
+        # -------------------------------------------------
 
         profile.save()
 
@@ -201,15 +383,23 @@ def doctor_dashboard(request):
             f"Profile updated for Dr. {profile.name}"
         )
 
-        # Admin selected doctor ko wahi rakho
+        # -------------------------------------------------
+        # Admin
+        # -------------------------------------------------
+
         if request.user.is_superuser:
 
             return redirect(
                 f"/doctor/dashboard/?doctor_id={profile.id}"
             )
 
-        # Normal doctor
-        return redirect("doctor_dashboard")
+        # -------------------------------------------------
+        # Normal Doctor
+        # -------------------------------------------------
+
+        return redirect(
+            "doctor_dashboard"
+        )
 
     # =====================================================
     # TEMPLATE CONTEXT
@@ -223,9 +413,10 @@ def doctor_dashboard(request):
 
     return render(
         request,
-        "doctor_register",
+        "doctor_register.html",
         context
     )
+
 
 # =========================================================
 # LOGOUT
@@ -235,52 +426,10 @@ def logout_view(request):
 
     logout(request)
 
-    return redirect("login")
+    return redirect(
+        "login"
+    )
 
-"""
-def index(request):
-
-    if request.method == "POST" and request.POST.get("form_type") == "feedback":
-
-        form = FeedbackForm(request.POST)
-
-        if form.is_valid():
-
-            feedback = form.save()
-
-            # New feedback remains pending
-            feedback.is_approved = False
-            feedback.save()
-
-            messages.success(
-                request,
-                "Thank you for your feedback! It will be visible after admin approval."
-            )
-
-            return redirect("home")
-
-        else:
-            messages.error(
-                request,
-                "Please correct the errors below."
-            )
-
-    else:
-        form = FeedbackForm()
-
-    # Only admin-approved feedback
-    approved_feedbacks = Feedback.objects.filter(
-        is_approved=True
-    ).order_by("-date_created")
-
-    return render(
-        request,
-        "index.html",
-        {
-            "feedback_form": form,
-            "feedbacks": approved_feedbacks,
-        }
-    )"""
 
 # =========================================================
 # HOME / FEEDBACK
@@ -288,15 +437,21 @@ def index(request):
 
 def index(request):
 
-    if request.method == "POST" and request.POST.get("form_type") == "feedback":
+    if (
+        request.method == "POST"
+        and request.POST.get("form_type") == "feedback"
+    ):
 
-        form = FeedbackForm(request.POST)
+        form = FeedbackForm(
+            request.POST
+        )
 
         if form.is_valid():
 
             feedback = form.save()
 
-            # Keep feedback hidden until admin approves it
+            # Feedback remains hidden
+            # until admin approves it
             feedback.is_approved = False
             feedback.save()
 
@@ -306,21 +461,32 @@ def index(request):
                 "It will be visible after admin approval."
             )
 
-            return redirect("home")
-
-        else:
-            messages.error(
-                request,
-                "Please correct the errors below."
+            return redirect(
+                "home"
             )
 
+        messages.error(
+            request,
+            "Please correct the errors below."
+        )
+
     else:
+
         form = FeedbackForm()
 
-    # Only show feedback approved by admin
-    approved_feedbacks = Feedback.objects.filter(
-        is_approved=True
-    ).order_by("-date_created")
+    # -----------------------------------------------------
+    # Only Approved Feedback
+    # -----------------------------------------------------
+
+    approved_feedbacks = (
+        Feedback.objects
+        .filter(
+            is_approved=True
+        )
+        .order_by(
+            "-date_created"
+        )
+    )
 
     return render(
         request,
@@ -332,18 +498,27 @@ def index(request):
     )
 
 
-
-
 # =========================================================
 # ABOUT
 # =========================================================
 
-from django.shortcuts import render
-from .models import DoctorProfile
-
 def about(request):
-    team_members = DoctorProfile.objects.filter(is_approved=True)
-    return render(request, 'about.html', {'team_members': team_members})
+
+    team_members = (
+        DoctorProfile.objects
+        .filter(
+            is_approved=True
+        )
+    )
+
+    return render(
+        request,
+        "about.html",
+        {
+            "team_members": team_members
+        }
+    )
+
 
 # =========================================================
 # SERVICES
@@ -357,59 +532,106 @@ def services(request):
     )
 
 
-
 # =========================================================
 # APPOINTMENT
 # =========================================================
-def appointment(request):
-    if request.method == "POST":
-        form = AppointmentForm(request.POST)
-        if form.is_valid():
-            # 1. Save directly to the database first
-            appointment = form.save()
 
-            # 2. Attempt to send emails after saving
+def appointment(request):
+
+    if request.method == "POST":
+
+        form = AppointmentForm(
+            request.POST
+        )
+
+        if form.is_valid():
+
+            # -------------------------------------------------
+            # Save Appointment First
+            # -------------------------------------------------
+
+            appointment_obj = form.save()
+
+            # -------------------------------------------------
+            # Send Emails
+            # -------------------------------------------------
+
             try:
-                subject = f"Appointment Confirmation - {appointment.name}"
+
+                # =============================================
+                # PATIENT EMAIL
+                # =============================================
+
+                subject = (
+                    f"Appointment Confirmation - "
+                    f"{appointment_obj.name}"
+                )
+
                 message = f"""
-Dear {appointment.name},
+Dear {appointment_obj.name},
 
 Your appointment has been booked successfully.
 
-Details:
-Date: {appointment.date}
-Time: {appointment.time}
-Service: {appointment.service}
-Amount: {appointment.amount or 'To be determined'}
+Appointment Details:
+
+Date: {appointment_obj.date}
+Time: {appointment_obj.time}
+Service: {appointment_obj.service}
+Amount: {
+    appointment_obj.amount
+    if appointment_obj.amount
+    else "To be determined"
+}
 
 We will contact you soon for confirmation.
 
 Best regards,
 Clinic Team
 """
+
                 send_mail(
                     subject,
                     message,
                     settings.DEFAULT_FROM_EMAIL,
-                    [appointment.email],
+                    [appointment_obj.email],
                     fail_silently=False,
                 )
 
-                admin_subject = f"New Appointment Booked - {appointment.name}"
+                # =============================================
+                # ADMIN EMAIL
+                # =============================================
+
+                admin_subject = (
+                    f"New Appointment Booked - "
+                    f"{appointment_obj.name}"
+                )
+
                 admin_message = f"""
-New appointment booked:
+New appointment booked.
 
-Name: {appointment.name}
-Email: {appointment.email}
-Phone: {appointment.phone}
-Date: {appointment.date}
-Time: {appointment.time}
-Service: {appointment.service}
-Amount: {appointment.amount or 'To be determined'}
-Message: {appointment.message}
+Patient Details:
 
-Please review and confirm.
+Name: {appointment_obj.name}
+Email: {appointment_obj.email}
+Phone: {appointment_obj.phone}
+
+Appointment Details:
+
+Date: {appointment_obj.date}
+Time: {appointment_obj.time}
+Service: {appointment_obj.service}
+Amount: {
+    appointment_obj.amount
+    if appointment_obj.amount
+    else "To be determined"
+}
+
+Message:
+{appointment_obj.message}
+
+Please review and confirm the appointment.
 """
+
                 send_mail(
                     admin_subject,
                     admin_message,
@@ -420,34 +642,45 @@ Please review and confirm.
 
                 messages.success(
                     request,
-                    "Appointment booked successfully! Confirmation email sent."
+                    "Appointment booked successfully! "
+                    "Confirmation email sent."
                 )
 
             except BadHeaderError:
+
                 messages.warning(
                     request,
-                    "Appointment booked, but email header was invalid."
+                    "Appointment booked, "
+                    "but email header was invalid."
                 )
+
             except Exception as e:
+
                 messages.warning(
                     request,
-                    f"Appointment booked, but email notification failed: {str(e)}"
+                    "Appointment booked, "
+                    "but email notification failed."
                 )
 
-            return redirect("appointment_success")
-
-        else:
-            messages.error(
-                request,
-                "Please correct the errors below."
+            return redirect(
+                "appointment_success"
             )
+
+        messages.error(
+            request,
+            "Please correct the errors below."
+        )
+
     else:
+
         form = AppointmentForm()
 
     return render(
         request,
         "appointment.html",
-        {"form": form}
+        {
+            "form": form
+        }
     )
 
 
@@ -459,7 +692,9 @@ def contact(request):
 
     if request.method == "POST":
 
-        form = ContactForm(request.POST)
+        form = ContactForm(
+            request.POST
+        )
 
         if form.is_valid():
 
@@ -470,7 +705,9 @@ def contact(request):
                 "Your message has been sent successfully!"
             )
 
-            return redirect("contact")
+            return redirect(
+                "contact"
+            )
 
     else:
 
@@ -512,8 +749,10 @@ def feedback_success(request):
         "feedback_success.html"
     )
 
-from django.shortcuts import get_object_or_404
 
+# =========================================================
+# FEEDBACK UPDATE
+# =========================================================
 
 def feedback_update(request, pk):
 
@@ -533,7 +772,8 @@ def feedback_update(request, pk):
 
             feedback = form.save()
 
-            # Edited feedback must be approved again
+            # Edited feedback requires
+            # admin approval again
             feedback.is_approved = False
             feedback.save()
 
@@ -543,7 +783,9 @@ def feedback_update(request, pk):
                 "It will be visible after admin approval."
             )
 
-            return redirect("home")
+            return redirect(
+                "home"
+            )
 
     else:
 
@@ -561,6 +803,10 @@ def feedback_update(request, pk):
     )
 
 
+# =========================================================
+# FEEDBACK DELETE
+# =========================================================
+
 def feedback_delete(request, pk):
 
     feedback = get_object_or_404(
@@ -577,4 +823,6 @@ def feedback_delete(request, pk):
             "Feedback deleted successfully."
         )
 
-    return redirect("home")
+    return redirect(
+        "home"
+    )
