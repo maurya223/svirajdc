@@ -19,20 +19,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # ============================================================
 
-# Get secret key from environment variable.
-# Local fallback is only for development.
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-local-development-only-key"
 )
 
-# DEBUG should be False in production.
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
-
-
-# ============================================================
-# ALLOWED HOSTS
-# ============================================================
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -56,7 +48,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Your application
     "home",
 ]
 
@@ -92,11 +83,8 @@ WSGI_APPLICATION = "svdc.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-
         "DIRS": [],
-
         "APP_DIRS": True,
-
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
@@ -195,10 +183,8 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-# Django will collect all static files here
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Your project's static directory
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
