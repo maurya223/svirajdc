@@ -24,15 +24,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get(
-        "ALLOWED_HOSTS",
-        "localhost,127.0.0.1",
-        "shreevirajdentalclinic.ap-southeast-2.elasticbeanstalk.com",
-    ).split(",")
-    if host.strip()
-]
+
 
 
 # ============================================================
@@ -198,8 +190,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "ALLOWED_HOSTS",
-        "localhost,127.0.0.1",
-        "shreevirajdentalclinic.ap-southeast-2.elasticbeanstalk.com",
+        "localhost,127.0.0.1,shreevirajdentalclinic.ap-southeast-2.elasticbeanstalk.com",
     ).split(",")
     if host.strip()
 ]
