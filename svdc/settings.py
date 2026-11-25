@@ -47,6 +47,18 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# ============================================================
+# HTTPS / CSRF SETTINGS
+# ============================================================
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://shreevirajdentalclinic.in",
+    "https://www.shreevirajdentalclinic.in",
+]
+
+# Django is behind Nginx reverse proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 
 # ============================================================
 # APPLICATIONS
@@ -114,7 +126,10 @@ TEMPLATES = [
 
 DB_NAME = os.environ.get("DB_NAME","postgres")
 DB_USER = os.environ.get("DB_USER","postgres")
-DB_PASSWORD = os.environ.get("DB_PASSWORD","Monu1234")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+if not DB_PASSWORD:
+    raise ImproperlyConfigured("DB_PASSWORD is missing from environment variables.")
+
 DB_HOST = os.environ.get("DB_HOST", "svdc-db.cvsu0mae0wq3.ap-southeast-2.rds.amazonaws.com")
 DB_PORT = os.environ.get("DB_PORT", "5432")
 
