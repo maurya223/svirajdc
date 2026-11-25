@@ -42,7 +42,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "ALLOWED_HOSTS",
-        "shreevirajdentalclinic.in,www.shreevirajdentalclinic.in,shreevirajdentalclinic.ap-southeast-2.elasticbeanstalk.com,localhost,127.0.0.1",
+        "shreevirajdentalclinic.in,www.shreevirajdentalclinic.in,shreevirajdentalclinic.ap-southeast-2.elasticbeanstalk.com,localhost,127.0.0.1"
     ).split(",")
     if host.strip()
 ]
