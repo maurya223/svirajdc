@@ -5,6 +5,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+# Environment variables and secrets
 
 # =========================
 # Virtual Environment
@@ -68,6 +69,7 @@ Thumbs.db
 *.egg-info/
 dist/
 build/
+8f*zp0mla^*vqva1+h59*lltwcz=0izj2oo727_grj=9^$^x^n
 
 # =========================
 # Jupyter
